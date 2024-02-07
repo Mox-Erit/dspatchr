@@ -8,16 +8,18 @@ defmodule Dspatchr.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      DspatchrWeb.Telemetry,
+      # Start the Ecto repository
       Dspatchr.Repo,
-      {DNSCluster, query: Application.get_env(:dspatchr, :dns_cluster_query) || :ignore},
+      # Start the Telemetry supervisor,
+      DspatchrWeb.Telemetry,
+      # Start the PubSub system
       {Phoenix.PubSub, name: Dspatchr.PubSub},
-      # Start the Finch HTTP client for sending emails
-      {Finch, name: Dspatchr.Finch},
+      # Start the Endpoint (http/https)
+      DspatchrWeb.Endpoint,
       # Start a worker by calling: Dspatchr.Worker.start_link(arg)
-      # {Dspatchr.Worker, arg},
-      # Start to serve requests, typically the last entry
-      DspatchrWeb.Endpoint
+      # {Dspatchr.Worker, arg}
+      # Start Oban
+      {Oban, oban_config()}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
@@ -32,5 +34,12 @@ defmodule Dspatchr.Application do
   def config_change(changed, _new, removed) do
     DspatchrWeb.Endpoint.config_change(changed, removed)
     :ok
+  end
+
+
+  # Conditionally disable queues or plugins here.
+  # For example on a staging environment
+  defp oban_config do
+    Application.fetch_env!(:dspatchr, Oban)
   end
 end
