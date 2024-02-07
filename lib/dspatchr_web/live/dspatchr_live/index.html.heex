@@ -1,0 +1,23 @@
+<h1>Contacts</h1>
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Vehicle</th>
+      <th>Status</th>
+      <th>Attempt</th>
+      <th>Attempt timestamp</th>
+    </tr>
+  </thead>
+  <tbody id="contacts">
+    <%= for contact <- @contacts do %>
+      <tr id={"contact-#{contact.id}"}>
+        <td><%= contact.name %></td>
+        <td><%= contact.vehicle %></td>
+        <td><%= contact.comm_status |> comm_status_display_value() %></td>
+        <td><%= contact.comm_attempt |> comm_attempt_display_value() %></td>
+        <td><%= contact.last_comm_attempt_time |> last_comm_attempt_time_display_value() %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
